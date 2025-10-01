@@ -38,9 +38,9 @@ function layout(cooldown) {
   return {
     paper_bgcolor: '#0b1220', plot_bgcolor: '#0b1220',
     font: { color: '#e6edf3' },
-    title: `Running Mean of All Equations (1-based multipliers)`,
+    title: `Stellar DPS`,
     xaxis: { title: 'Time (s)', tick0: 0, dtick: 30, gridcolor: '#1f2937' },
-    yaxis: { title: 'Running mean (multiplier)', gridcolor: '#1f2937' },
+    yaxis: { title: 'Stellar DPS', gridcolor: '#1f2937' },
     shapes: breakpoints.map(bp => ({ type: 'line', x0: bp, x1: bp, y0: 0, y1: 2.5, xref: 'x', yref: 'paper', line: { color: 'rgba(148,163,184,0.5)', dash: 'dash' }})),
     margin: { l: 60, r: 30, t: 40, b: 50 },
     legend: { orientation: 'h', y: -0.2 },
