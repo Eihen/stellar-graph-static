@@ -14,7 +14,7 @@ export function createEquations() {
     { key: 'Toybox', color: 'orange', gen: () => map((ti)=> ti < 60 ? 1.48 : 1.0) },
     { key: 'Burning Will', color: 'green', gen: () => map((ti)=> ti < 90 ? 1.0 : 1.28) },
     { key: 'Doomsday', color: 'red', gen: () => map((ti)=> ti < 15 ? 1.8 : 0.9) },
-    { key: 'Core Garden', color: 'purple', gen: ({cooldown}) => map((ti)=> ti < 15 ? 0.006 * 10 : 0.006 * cooldown) },
+    { key: 'Core Garden', color: 'purple', gen: ({cooldown}) => map((ti)=> 1.0 + (ti < 15 ? 0.006 * 10 : 0.006 * cooldown)) },
     { key: 'Cross Path', color: 'brown', gen: () => constant([...Array(8).keys()].reduce((acc, i)=> acc + Math.pow(1.04, i)/8.0, 0)) },
     { key: 'Little Corona', color: 'pink', gen: ({cooldown}) => {
         if (cooldown < 30) {
