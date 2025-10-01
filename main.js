@@ -86,7 +86,7 @@ resetBtn.addEventListener('click', () => {
 function redraw() {
   const cooldown = cdrToggle.checked ? 27 : 30;
   const series = build(cooldown, enabledKeys);
-  const data = series.map(s => ({ x: t, y: s.mean, type: 'scatter', mode: 'lines', name: s.key, line: { color: s.color, width: 2 } }));
+  const data = series.map(s => ({ x: t, y: s.mean.map(v * 10), type: 'scatter', mode: 'lines', name: s.key, line: { color: s.color, width: 2 } }));
   Plotly.react('chart', data, layout(cooldown), {responsive: true, displaylogo: false});
 
   // Rankings by battle length (static 30s ticks)

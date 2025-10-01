@@ -6,7 +6,7 @@ export function renderTable(containerId, secondsList, series, t) {
   const cols = secondsList.map(sec => {
     const idx = Math.min(sec, t.length - 1);
     const sorted = [...series]
-      .map(s => ({ name: s.key, value: Number(s.mean[idx].toFixed(4)) }))
+      .map(s => ({ name: s.key, value: Number((s.mean[idx] * 10).toFixed(4)) }))
       .sort((a, b) => b.value - a.value);
     return { sec, rows: sorted };
   });
