@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stellar Plot - Interactive</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px; background:#0b1220; color:#e6edf3; }
+      h1 { margin: 0 0 12px; font-size: 20px; }
+      .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+      .card { background:#111827; border:1px solid #243145; border-radius: 10px; padding: 12px 14px; }
+      .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      label { display:flex; align-items:center; gap:6px; }
+      .eqs { display:flex; flex-wrap:wrap; gap:10px; }
+      .pill { display:inline-flex; gap:6px; align-items:center; border:1px solid #2b3b52; border-radius: 999px; padding:6px 10px; background:#0f172a; }
+      input[type="checkbox"] { accent-color:#3b82f6; }
+      select, button { background:#0f172a; color:#e6edf3; border:1px solid #2b3b52; border-radius:8px; padding:6px 10px; }
+      button.primary { background:#2563eb; border-color:#2563eb; }
+      a { color:#93c5fd; }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <h1>Stellar Plot (Interactive)</h1>
+    <div class="controls card">
+      <div class="row">
+        <label title="If enabled, cooldown is 27s instead of 30s">
+          <input type="checkbox" id="celestialCdr" />
+          Apply Celestial CDR
+        </label>
+        <button id="reset" class="primary">Reset</button>
+      </div>
+      <div class="row">
+        <div class="eqs" id="eqToggles"></div>
+      </div>
+    </div>
+
+    <div id="chart" class="card" style="height: 640px"></div>
+    <h2 style="margin:12px 0 6px; font-size:16px; font-weight:600; opacity:.9">Top by battle length</h2>
+    <div id="rankings" class="card" style="overflow:auto"></div>
+    <h2 style="margin:12px 0 6px; font-size:16px; font-weight:600; opacity:.9">Top by casts</h2>
+    <div id="rankingsCasts" class="card" style="overflow:auto"></div>
+  </body>
+</html>
