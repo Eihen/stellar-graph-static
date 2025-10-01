@@ -1,8 +1,12 @@
 import { createEquations } from './equations.js';
-import { renderTable } from './tables.js';
+import { renderTable, createBreakpointToggles } from './tables.js';
 
 const { t, eqDefs } = createEquations();
 const breakpoints = [30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
+
+// State for selected breakpoints
+let selectedBreakpoints = new Set(breakpoints);
+let selectedCastTimes = new Set(); // Will be populated with actual cast times
 
 function runningMean(arr) {
   const out = new Array(arr.length);
@@ -72,7 +76,45 @@ for (const def of eqDefs) {
   eqToggles.appendChild(wrap);
 }
 
-cdrToggle.addEventListener('change', redraw);
+// Function to generate cast times based on cooldown
+function generateCastTimes(cooldown) {
+  const castTimes = [];
+  for (let ti = 0; ti <= t.length - 1; ti++) {
+    if (ti % cooldown === 10) castTimes.push(ti);
+  }
+  return castTimes;
+}
+
+// Setup breakpoint toggles
+createBreakpointToggles('breakpointToggles', breakpoints, () => {
+  selectedBreakpoints.clear();
+  const checkboxes = document.querySelectorAll('#breakpointToggles input[type="checkbox"]');
+  checkboxes.forEach((cb, i) => {
+    if (cb.checked) selectedBreakpoints.add(breakpoints[i]);
+  });
+  redraw();
+});
+
+// Setup cast time toggles - will be updated when cooldown changes
+function setupCastTimeToggles(cooldown) {
+  const castTimes = generateCastTimes(cooldown);
+  selectedCastTimes = new Set(castTimes); // Initialize with all cast times selected
+  
+  createBreakpointToggles('breakpointTogglesCasts', castTimes, () => {
+    selectedCastTimes.clear();
+    const checkboxes = document.querySelectorAll('#breakpointTogglesCasts input[type="checkbox"]');
+    checkboxes.forEach((cb, i) => {
+      if (cb.checked) selectedCastTimes.add(castTimes[i]);
+    });
+    redraw();
+  });
+}
+
+cdrToggle.addEventListener('change', () => {
+  const cooldown = cdrToggle.checked ? 27 : 30;
+  setupCastTimeToggles(cooldown);
+  redraw();
+});
 resetBtn.addEventListener('click', () => {
   for (const def of eqDefs) {
     const id = 'eq-' + def.key.replace(/\s+/g,'-');
@@ -80,6 +122,14 @@ resetBtn.addEventListener('click', () => {
     enabledKeys.add(def.key);
   }
   cdrToggle.checked = false;
+  
+  // Reset breakpoint toggles
+  selectedBreakpoints = new Set(breakpoints);
+  document.querySelectorAll('#breakpointToggles input[type="checkbox"]').forEach(cb => cb.checked = true);
+  
+  // Reset cast time toggles
+  setupCastTimeToggles(30); // Default cooldown
+  
   redraw();
 });
 
@@ -89,15 +139,15 @@ function redraw() {
   const data = series.map(s => ({ x: t, y: s.mean.map(v => v * 10), type: 'scatter', mode: 'lines', name: s.key, line: { color: s.color, width: 2 } }));
   Plotly.react('chart', data, layout(cooldown), {responsive: true, displaylogo: false});
 
-  // Rankings by battle length (static 30s ticks)
-  renderTable('rankings', breakpoints, series, t);
+  // Rankings by battle length (static 30s ticks) - use selected breakpoints
+  const filteredBreakpoints = breakpoints.filter(bp => selectedBreakpoints.has(bp));
+  renderTable('rankings', filteredBreakpoints, series, t);
 
-  // Rankings by casts: use the same times used by the condition (ti % cooldown === 10)
-  const castTimes = [];
-  for (let ti = 0; ti <= t.length - 1; ti++) {
-    if (ti % cooldown === 10) castTimes.push(ti);
-  }
-  renderTable('rankingsCasts', castTimes, series, t);
+  // Rankings by casts: use actual cast times
+  const filteredCastTimes = Array.from(selectedCastTimes).sort((a, b) => a - b);
+  renderTable('rankingsCasts', filteredCastTimes, series, t);
 }
 
+// Initialize cast time toggles
+setupCastTimeToggles(30);
 redraw();
