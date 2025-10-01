@@ -9,7 +9,6 @@ export function createEquations() {
   const constant = (v) => Array(t.length).fill(v);
 
   const eqDefs = [
-    { key: 'Base', color: 'black', gen: () => constant(1.0) },
     { key: "World's Night", color: 'blue', gen: () => map((ti)=> 1.0 + Math.min(Math.floor(ti/40.0)*0.08, 5*0.08)) },
     { key: 'Toybox', color: 'orange', gen: () => map((ti)=> ti < 60 ? 1.48 : 1.0) },
     { key: 'Burning Will', color: 'green', gen: () => map((ti)=> ti < 90 ? 1.0 : 1.28) },
