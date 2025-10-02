@@ -22,9 +22,9 @@ export function createEquations() {
         }
         return map((ti)=> ti < 15 ? 1.0 : 1.16);
       } },
-    { key: 'Celestial', color: 'cyan', gen: () => constant(1.035) },
+    { key: 'Celestial', color: 'cyan', gen: () => constant(1.035), cooldownModifier: (cooldown) => cooldown - 3 },
     { key: 'Cosmos Sky', color: 'grey', gen: () => constant(0.98 * 1.39)},
-    { key: 'Evolution & Growth', colo: 'aquamarine', gen: () => map((ti) => 1.0 + (ti < 15 ? 0 : 0.014 * hits))}
+    { key: 'Evolution & Growth', color: 'aquamarine', gen: () => map((ti) => 1.0 + (ti < 15 ? 0 : 0.014 * hits))}
   ];
 
   return { t, eqDefs };

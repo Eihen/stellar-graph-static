@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stellar Plot - Interactive</title>
+    <title>Stellar Simulator</title>
     <style>
       :root {
         color-scheme: dark;
@@ -62,7 +62,42 @@
       select, button { background: var(--bg-element); color: var(--text-primary); border: 1px solid var(--border-element); border-radius:8px; padding:6px 10px; }
       button.primary { background: var(--accent-border); border-color: var(--accent-border); }
       a { color: var(--link-color); }
-
+      
+      /* Tooltip styles */
+      .tooltip-wrapper {
+        position: relative;
+        display: inline-block;
+        width: fit-content;
+      }
+      .tooltip-content {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 0;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        white-space: pre-line;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+      }
+      .tooltip-content.visible {
+        display: block;
+      }
+      /* Arrow */
+      .tooltip-content::before {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 20px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent transparent var(--border-color) transparent;
+      }
     </style>
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <script type="module" src="./main.js"></script>
@@ -77,14 +112,14 @@
       <h1>Stellar Plot (Interactive)</h1>
     </div>
     <div class="controls card">
-      <div class="row">
-        <label title="If enabled, cooldown is 27s instead of 30s">
-          <input type="checkbox" id="celestialCdr" />
-          Apply Celestial CDR
-        </label>
-      </div>
       <div class="row" style="justify-content: space-between">
-        <div class="eqs" id="eqToggles"></div>
+        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1">
+          <div class="tooltip-wrapper">
+            <div id="cooldownDisplay" class="pill" style="width: fit-content">Stellar Cooldown: 30s</div>
+            <div class="tooltip-content"></div>
+          </div>
+          <div class="eqs" id="eqToggles"></div>
+        </div>
         <button id="reset" class="primary">Reset</button>
       </div>
     </div>

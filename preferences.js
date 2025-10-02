@@ -8,7 +8,6 @@ export function loadPreferences(eqDefs, breakpoints) {
     const prefs = JSON.parse(savedPrefs);
     return {
       theme: prefs.theme,
-      celestialCdr: prefs.celestialCdr,
       enabledKeys: new Set(prefs.enabledKeys),
       selectedBreakpoints: new Set(prefs.selectedBreakpoints),
       selectedCastTimes: new Set(prefs.selectedCastTimes)
@@ -18,17 +17,15 @@ export function loadPreferences(eqDefs, breakpoints) {
   // Default preferences - everything enabled
   return {
     theme: 'dark',
-    celestialCdr: false,
     enabledKeys: new Set(eqDefs.map(d => d.key)),
     selectedBreakpoints: new Set(breakpoints),
     selectedCastTimes: null // Will be set when setupCastTimeToggles is called
   };
 }
 
-export function savePreferences({ theme, celestialCdr, enabledKeys, selectedBreakpoints, selectedCastTimes }) {
+export function savePreferences({ theme, enabledKeys, selectedBreakpoints, selectedCastTimes }) {
   localStorage.setItem('stellar-plot-prefs', JSON.stringify({
     theme,
-    celestialCdr,
     enabledKeys: Array.from(enabledKeys),
     selectedBreakpoints: Array.from(selectedBreakpoints),
     selectedCastTimes: Array.from(selectedCastTimes)
@@ -49,7 +46,6 @@ export function setupPreferences(state, eqDefs, breakpoints) {
   Object.assign(state, prefs);
 
   // Initialize UI with loaded preferences
-  document.getElementById('celestialCdr').checked = state.celestialCdr;
   document.getElementById('themeToggle').dataset.active = state.theme === 'dark';
   document.documentElement.dataset.theme = state.theme;
 
@@ -82,10 +78,5 @@ export function setupPreferences(state, eqDefs, breakpoints) {
     themeToggle.dataset.active = state.theme === 'dark';
     savePreferences(state);
     redraw();
-  });
-
-  document.getElementById('celestialCdr').addEventListener('change', (e) => {
-    state.celestialCdr = e.target.checked;
-    savePreferences(state);
   });
 }
