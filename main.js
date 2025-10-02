@@ -11,7 +11,8 @@ const state = {
   selectedBreakpoints: new Set(breakpoints),
   selectedCastTimes: new Set(), // Will be populated with actual cast times
   theme: 'dark',
-  enabledKeys: new Set(eqDefs.map(d => d.key)) // Initialize with all equations enabled
+  enabledKeys: new Set(eqDefs.map(d => d.key)), // Initialize with all equations enabled
+  finalDpsEnabled: false // Initialize Final DPS as disabled
 };
 
 function runningMean(arr) {
@@ -32,12 +33,32 @@ function constant(v) { return Array(t.length).fill(v); }
 function build(cooldown, enabledKeys) {
   const cond = t.map((ti) => ti % cooldown === 10);
   const series = [];
+  const rawValues = new Map();
+  
+  // Calculate individual equation values
   for (const def of eqDefs) {
     if (!enabledKeys.has(def.key)) continue;
     const raw = def.gen({ t, cooldown });
     const gated = where(cond, raw, constant(0.0));
     const mean = runningMean(gated);
     series.push({ key: def.key, color: def.color, mean });
+    rawValues.set(def.key, raw);
+  }
+  
+    // Calculate Final DPS if enabled
+  if (state.finalDpsEnabled && rawValues.size > 0) {
+    const finalRaw = t.map((_, i) => {
+      let product = 1.0;
+      for (const raw of rawValues.values()) {
+        product *= raw[i];
+      }
+      return product;
+    });
+    const finalGated = where(cond, finalRaw, constant(0.0));
+    const finalMean = runningMean(finalGated);
+    // Use theme-aware color for Final DPS
+    const isDark = document.documentElement.dataset.theme !== 'light';
+    series.push({ key: 'Final DPS', color: isDark ? '#ffffff' : '#000000', mean: finalMean });
   }
   return series;
 }
@@ -167,6 +188,8 @@ resetBtn.addEventListener('click', () => {
     const cb = document.getElementById(id); if (cb) cb.checked = true;
     state.enabledKeys.add(def.key);
   }
+  state.finalDpsEnabled = false;
+  document.getElementById('final-dps').checked = false;
 
   // Reset breakpoint toggles
   state.selectedBreakpoints = new Set(breakpoints);
@@ -243,6 +266,13 @@ tooltip.addEventListener('mouseleave', () => {
 document.addEventListener('click', () => {
   tooltip.classList.remove('visible');
   isTooltipVisible = false;
+});
+
+// Setup Final DPS toggle
+document.getElementById('final-dps').addEventListener('change', (e) => {
+  state.finalDpsEnabled = e.target.checked;
+  savePreferences(state);
+  redraw();
 });
 
 // Initialize preferences and UI

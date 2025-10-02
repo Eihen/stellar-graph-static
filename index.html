@@ -16,6 +16,7 @@
         --accent-color: #3b82f6;
         --accent-border: #2563eb;
         --link-color: #93c5fd;
+        --final-dps-color: #ffffff;
       }
       :root[data-theme="light"] {
         color-scheme: light;
@@ -28,6 +29,7 @@
         --accent-color: #3b82f6;
         --accent-border: #2563eb;
         --link-color: #2563eb;
+        --final-dps-color: #000000;
       }
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px; background: var(--bg-main); color: var(--text-primary); }
       h1 { margin: 0; font-size: 20px; }
@@ -109,7 +111,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
-      <h1>Stellar Plot (Interactive)</h1>
+      <h1>Stellar Simulator</h1>
     </div>
     <div class="controls card">
       <div class="row" style="justify-content: space-between">
@@ -119,6 +121,14 @@
             <div class="tooltip-content"></div>
           </div>
           <div class="eqs" id="eqToggles"></div>
+          <div style="width: 100%; height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+          <div class="eqs" style="justify-content: flex-start;">
+            <label class="pill" style="border-color: var(--final-dps-color)">
+              <input type="checkbox" id="final-dps">
+              <span style="width: 10px; height: 10px; background: var(--final-dps-color); border-radius: 999px; display: inline-block;"></span>
+              <span>Final DPS</span>
+            </label>
+          </div>
         </div>
         <button id="reset" class="primary">Reset</button>
       </div>

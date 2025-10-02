@@ -10,7 +10,8 @@ export function loadPreferences(eqDefs, breakpoints) {
       theme: prefs.theme,
       enabledKeys: new Set(prefs.enabledKeys),
       selectedBreakpoints: new Set(prefs.selectedBreakpoints),
-      selectedCastTimes: new Set(prefs.selectedCastTimes)
+      selectedCastTimes: new Set(prefs.selectedCastTimes),
+      finalDpsEnabled: prefs.finalDpsEnabled ?? false
     };
   }
 
@@ -19,16 +20,18 @@ export function loadPreferences(eqDefs, breakpoints) {
     theme: 'dark',
     enabledKeys: new Set(eqDefs.map(d => d.key)),
     selectedBreakpoints: new Set(breakpoints),
-    selectedCastTimes: null // Will be set when setupCastTimeToggles is called
+    selectedCastTimes: null, // Will be set when setupCastTimeToggles is called
+    finalDpsEnabled: false
   };
 }
 
-export function savePreferences({ theme, enabledKeys, selectedBreakpoints, selectedCastTimes }) {
+export function savePreferences({ theme, enabledKeys, selectedBreakpoints, selectedCastTimes, finalDpsEnabled }) {
   localStorage.setItem('stellar-plot-prefs', JSON.stringify({
     theme,
     enabledKeys: Array.from(enabledKeys),
     selectedBreakpoints: Array.from(selectedBreakpoints),
-    selectedCastTimes: Array.from(selectedCastTimes)
+    selectedCastTimes: Array.from(selectedCastTimes),
+    finalDpsEnabled
   }));
 }
 
@@ -48,6 +51,7 @@ export function setupPreferences(state, eqDefs, breakpoints) {
   // Initialize UI with loaded preferences
   document.getElementById('themeToggle').dataset.active = state.theme === 'dark';
   document.documentElement.dataset.theme = state.theme;
+  document.getElementById('final-dps').checked = state.finalDpsEnabled;
 
   // Initialize equation toggles
   const eqToggles = document.querySelectorAll('#eqToggles input[type="checkbox"]');
