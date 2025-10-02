@@ -75,6 +75,7 @@ for (const def of eqDefs) {
   cb.id = id; cb.checked = true;
   cb.addEventListener('change', () => {
     if (cb.checked) state.enabledKeys.add(def.key); else state.enabledKeys.delete(def.key);
+    savePreferences(state);
     redraw();
   });
   const dot = document.createElement('span');
@@ -100,13 +101,16 @@ createBreakpointToggles('breakpointToggles', breakpoints, () => {
   checkboxes.forEach((cb, i) => {
     if (cb.checked) state.selectedBreakpoints.add(breakpoints[i]);
   });
+  savePreferences(state);
   redraw();
 });
 
 // Setup cast time toggles - will be updated when cooldown changes
 function setupCastTimeToggles(cooldown) {
   const castTimes = generateCastTimes(cooldown);
-  state.selectedCastTimes = new Set(castTimes); // Initialize with all cast times selected
+  if (!state.selectedCastTimes) {
+    state.selectedCastTimes = new Set(castTimes);
+  }
   
   createBreakpointToggles('breakpointTogglesCasts', castTimes, () => {
     state.selectedCastTimes.clear();
@@ -114,6 +118,7 @@ function setupCastTimeToggles(cooldown) {
     checkboxes.forEach((cb, i) => {
       if (cb.checked) state.selectedCastTimes.add(castTimes[i]);
     });
+    savePreferences(state);
     redraw();
   });
 }
@@ -160,7 +165,7 @@ export function redraw() {
   renderTable('rankingsCasts', filteredCastTimes, series, t);
 }
 
-// Initialize cast time toggles and preferences
-setupCastTimeToggles(30);
-setupPreferences(state);
+// Initialize preferences and UI
+setupPreferences(state, eqDefs, breakpoints);
+setupCastTimeToggles(state.celestialCdr ? 27 : 30);
 redraw();
