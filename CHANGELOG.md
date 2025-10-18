@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0]
+
+### Added
+- **Share Feature for Groups Tab**: Complete implementation of shareable URLs for group configurations
+  - Share button generates URL with encoded group state (groups, breakpoints, cast times)
+  - URL state loads automatically on page load without overwriting localStorage preferences
+  - Dual storage key system (temporary key for URL state, default key for saved preferences)
+  - "Save to Preferences" button appears when loaded from URL to persist configuration
+  - Copy-to-clipboard functionality with visual feedback
+  - Automatic switch to groups tab when loading from shared URL
+  - Base64 encoding for compact URL generation
+
+### Changed
+- Refactored button handlers into self-contained components following event-driven architecture
+  - Created `ShareButton` component for generating and copying shareable URLs
+  - Created `PersistButton` component for saving URL state to preferences
+  - Created `ResetButton` component for resetting application state
+- Moved share and persist buttons inside group manager card for better UX
+- Share button now displays URL as selectable text on page instead of alert when clipboard fails
+  - Added close button (×) to URL display box in top right corner
+  - URL textbox uses `box-sizing: border-box` to prevent overflow
+- **Optimized URL state compression** for significantly shorter share URLs
+  - Shortened property names: `groups`→`g`, `name`→`n`, `keys`→`k`, `color`→`c`, etc.
+  - **Use numeric equation IDs** (0-9) instead of full equation names in URLs (saves 60-70%)
+  - Omit default values (default group names, empty arrays)
+  - Backward compatible with all legacy URL formats
+  - Total savings: 70-85% reduction in URL length compared to original format
+
+### Fixed
+- Individual tab ranking tables incorrectly showing grouped equations alongside individual equations in both "Top by mean" and "Top by casts" tables
+- Cast time explanation footer incorrectly showing on battle length tables (now only shows on cast time tables in groups mode)
+
 ## [2.0.0]
 
 ### Added

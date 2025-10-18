@@ -23,6 +23,9 @@ import { BreakpointToggles } from './components/breakpoint-toggles.js';
 import { CastTimeToggles } from './components/cast-time-toggles.js';
 import { ThemeToggle } from './components/theme-toggle.js';
 import { GroupManager } from './components/group-manager.js';
+import { ShareButton } from './components/share-button.js';
+import { PersistButton } from './components/persist-button.js';
+import { ResetButton } from './components/reset-button.js';
 
 /**
  * Create initial state
@@ -58,7 +61,7 @@ export function createApp() {
   const stateManager = new StateManager(eventBus, initialState);
 
   // 4. Create StorageManager (handles persistence)
-  const storageManager = new StorageManager(eventBus, stateManager);
+  const storageManager = new StorageManager(eventBus, stateManager, equations);
 
   // 5. Create CalculationManager (orchestrates calculations)
   const calculationManager = new CalculationManager(eventBus, stateManager, {
@@ -198,31 +201,48 @@ export function createApp() {
     'breakpointTogglesCastsGroups'
   );
 
-  // 7. Setup reset button
-  const resetBtn = document.getElementById('reset');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      // Reset state
-      stateManager.resetEquations(equations.map(eq => eq.key));
+  // 7. Setup button components
+  const resetButton = new ResetButton(
+    eventBus,
+    stateManager,
+    'reset',
+    {
+      equationKeys: equations.map(eq => eq.key),
+      breakpoints: BREAKPOINTS
+    }
+  );
 
-      // Reset breakpoints (will emit event)
-      stateManager.updateBreakpoints(BREAKPOINTS);
+  const shareButton = new ShareButton(
+    eventBus,
+    storageManager,
+    'shareButton'
+  );
 
-      // Reset theme
-      if (stateManager.getState().theme !== 'dark') {
-        stateManager.changeTheme('dark');
-      }
-    });
-  }
+  const persistButton = new PersistButton(
+    eventBus,
+    storageManager,
+    'persistButton',
+    'shareButton'
+  );
 
   // 8. Load saved state or trigger initial calculation
-  const savedState = storageManager.load();
-  if (savedState) {
-    // Loading state will emit STATE_HYDRATED, which triggers calculations
-    stateManager.loadState(savedState);
+  // Check for URL state first
+  const urlState = storageManager.loadFromUrl();
+  if (urlState) {
+    // Load from URL (partial state)
+    const defaultState = storageManager.load() || {};
+    const mergedState = { ...defaultState, ...urlState };
+    stateManager.loadState(mergedState);
   } else {
-    // No saved state, trigger initial calculation with default state
-    calculationManager.forceRecalculate();
+    // Load from localStorage
+    const savedState = storageManager.load();
+    if (savedState) {
+      // Loading state will emit STATE_HYDRATED, which triggers calculations
+      stateManager.loadState(savedState);
+    } else {
+      // No saved state, trigger initial calculation with default state
+      calculationManager.forceRecalculate();
+    }
   }
 
   // Apply theme to document

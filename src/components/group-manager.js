@@ -120,6 +120,21 @@ export class GroupManager {
     });
 
     this.container.appendChild(cardsContainer);
+
+    // Add buttons container
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.style.cssText = 'display: flex; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);';
+    buttonsContainer.innerHTML = `
+      <button id="shareButton" class="primary">Share</button>
+      <button id="persistButton" class="primary" style="display: none;">Save to Preferences</button>
+    `;
+    this.container.appendChild(buttonsContainer);
+
+    // Add URL display container
+    const urlDisplayContainer = document.createElement('div');
+    urlDisplayContainer.id = 'shareUrlDisplay';
+    urlDisplayContainer.style.cssText = 'display: none; margin-top: 12px;';
+    this.container.appendChild(urlDisplayContainer);
   }
 
   /**

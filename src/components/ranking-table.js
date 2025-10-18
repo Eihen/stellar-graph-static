@@ -105,7 +105,8 @@ export class RankingTable {
       }
     }
 
-    // Render table
-    renderTable(this.containerId, timePoints, seriesToRender, this.timeAxis);
+    // Render table (show footer only for cast time tables in groups mode)
+    const showCastFooter = this.type === 'casts' && this.mode === 'groups';
+    renderTable(this.containerId, timePoints, seriesToRender, this.timeAxis, showCastFooter);
   }
 }

@@ -9,8 +9,9 @@
  * @param {Array<number>} timePoints - Time points to show columns for
  * @param {Array<{key: string, mean: number[]}>} series - Series data
  * @param {number[]} timeAxis - Full time axis
+ * @param {boolean} showCastFooter - Whether to show cast time explanation footer
  */
-export function renderTable(containerId, timePoints, series, timeAxis) {
+export function renderTable(containerId, timePoints, series, timeAxis, showCastFooter = false) {
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`Container #${containerId} not found`);
@@ -81,8 +82,10 @@ export function renderTable(containerId, timePoints, series, timeAxis) {
 
   html += '</div>';
 
-  // Add footer explaining bold text
-  html += '<div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #2b3b52; opacity: 0.7; font-size: 0.9em;">Bold entries indicate actual cast times for that group.</div>';
+  // Add footer explaining bold text (only for cast time tables)
+  if (showCastFooter) {
+    html += '<div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #2b3b52; opacity: 0.7; font-size: 0.9em;">Bold entries indicate actual cast times for that group.</div>';
+  }
 
   container.innerHTML = html;
 }
