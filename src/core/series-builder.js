@@ -4,6 +4,7 @@
  */
 
 import { runningMean, where, constant, product } from './math.js';
+import { calculateCooldownForKeys, createCastCondition, generateCastTimes } from './cooldown.js';
 
 /**
  * Build a series from a single equation
@@ -78,22 +79,36 @@ export function buildCombinedSeries(series, castCondition, key = 'Final DPS', co
 }
 
 /**
- * Build equation groups (for future feature: multiple groups)
+ * Build equation groups with per-group cooldown isolation
  * @param {Array} equations - All equation definitions
  * @param {Array<{name: string, keys: Set<string>, color: string}>} groups - Group definitions
  * @param {number[]} timeAxis - Time axis array
- * @param {number} cooldown - Current cooldown value
- * @param {boolean[]} castCondition - When casts happen
- * @returns {Array<{key: string, color: string, raw: number[], gated: number[], mean: number[]}>}
+ * @param {number} baseCooldown - Base cooldown value (before modifiers)
+ * @param {number} castOffset - Cast offset
+ * @returns {Array<{key: string, color: string, raw: number[], gated: number[], mean: number[], cooldown: number, modifiers: Array, castTimes: Array}>}
  */
-export function buildGroupSeries(equations, groups, timeAxis, cooldown, castCondition) {
+export function buildGroupSeries(equations, groups, timeAxis, baseCooldown, castOffset) {
   return groups.map(group => {
-    // Build series for equations in this group
+    // Calculate cooldown for this specific group's equations
+    const { cooldown, modifiers } = calculateCooldownForKeys(baseCooldown, equations, group.keys);
+
+    // Create cast condition for this group's cooldown
+    const castCondition = createCastCondition(timeAxis, cooldown, castOffset);
+
+    // Build series for equations in this group with group-specific cooldown
     const groupSeries = equations
       .filter(eq => group.keys.has(eq.key))
       .map(eq => buildSeries(eq, timeAxis, cooldown, castCondition));
 
     // Combine into a single series for the group
-    return buildCombinedSeries(groupSeries, castCondition, group.name, group.color);
+    const combinedSeries = buildCombinedSeries(groupSeries, castCondition, group.name, group.color);
+
+    // Add per-group cooldown data
+    return {
+      ...combinedSeries,
+      cooldown,
+      modifiers,
+      castTimes: generateCastTimes(timeAxis[timeAxis.length - 1], cooldown, castOffset)
+    };
   });
 }

@@ -62,3 +62,37 @@ export function generateCastTimes(maxTime, cooldown, offset = 10) {
 export function createCastCondition(timeAxis, cooldown, offset = 10) {
   return timeAxis.map(t => t % cooldown === offset);
 }
+
+/**
+ * Calculate cooldown for a specific set of equation keys
+ * Used for per-group cooldown isolation
+ * @param {number} baseCooldown - Base cooldown value
+ * @param {Array<{key: string, cooldownModifier?: Function}>} equations - All equations
+ * @param {Set<string>} keys - Specific keys to consider for cooldown modifiers
+ * @returns {{cooldown: number, modifiers: Array<{key: string, from: number, to: number}>}}
+ */
+export function calculateCooldownForKeys(baseCooldown, equations, keys) {
+  let currentCooldown = baseCooldown;
+  const modifiers = [];
+
+  // Get equations in this specific set that have cooldown modifiers
+  const activeModifiers = equations
+    .filter(eq => keys.has(eq.key) && eq.cooldownModifier);
+
+  // Apply each modifier sequentially
+  for (const eq of activeModifiers) {
+    const previousCooldown = currentCooldown;
+    currentCooldown = eq.cooldownModifier(currentCooldown);
+
+    // Track if modifier actually changed the cooldown
+    if (currentCooldown !== previousCooldown) {
+      modifiers.push({
+        key: eq.key,
+        from: previousCooldown,
+        to: currentCooldown
+      });
+    }
+  }
+
+  return { cooldown: currentCooldown, modifiers };
+}

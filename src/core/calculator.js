@@ -34,10 +34,10 @@ export function calculate({
   // Build series for individual equations
   const series = buildAllSeries(equations, enabledKeys, timeAxis, cooldown, castCondition);
 
-  // Build group series if provided
+  // Build group series if provided (with per-group cooldown isolation)
   let groupSeries = null;
   if (groups && groups.length > 0) {
-    groupSeries = buildGroupSeries(equations, groups, timeAxis, cooldown, castCondition);
+    groupSeries = buildGroupSeries(equations, groups, timeAxis, baseCooldown, castOffset);
   }
 
   return {

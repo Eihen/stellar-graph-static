@@ -69,6 +69,23 @@ export class StateManager {
   }
 
   /**
+   * Change active tab
+   * @param {string} tab - 'individual' or 'groups'
+   */
+  changeTab(tab) {
+    if (tab !== 'individual' && tab !== 'groups') {
+      console.error(`Invalid tab: ${tab}`);
+      return;
+    }
+
+    this.state.activeTab = tab;
+
+    this.eventBus.emit(Events.TAB_CHANGED, {
+      tab
+    });
+  }
+
+  /**
    * Update selected breakpoints
    * @param {Array<number>} breakpoints - Selected breakpoint values
    */
@@ -158,7 +175,8 @@ export class StateManager {
       theme: this.state.theme,
       selectedBreakpoints: Array.from(this.state.selectedBreakpoints),
       selectedCastTimes: Array.from(this.state.selectedCastTimes),
-      groups: [...this.state.groups]
+      groups: [...this.state.groups],
+      activeTab: this.state.activeTab
     });
   }
 }

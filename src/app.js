@@ -14,6 +14,7 @@ import { createEquations } from './config/equations.js';
 import { BASE_COOLDOWN, BREAKPOINTS, CAST_OFFSET, CONFIG } from './config/constants.js';
 
 // UI Components
+import { TabSwitcher } from './components/tab-switcher.js';
 import { CooldownDisplay } from './components/cooldown-display.js';
 import { ChartComponent } from './components/chart-component.js';
 import { RankingTable } from './components/ranking-table.js';
@@ -21,6 +22,7 @@ import { EquationToggles } from './components/equation-toggles.js';
 import { BreakpointToggles } from './components/breakpoint-toggles.js';
 import { CastTimeToggles } from './components/cast-time-toggles.js';
 import { ThemeToggle } from './components/theme-toggle.js';
+import { GroupManager } from './components/group-manager.js';
 
 /**
  * Create initial state
@@ -31,7 +33,8 @@ function createInitialState(equations, breakpoints) {
     selectedBreakpoints: new Set(breakpoints),
     selectedCastTimes: new Set(),
     theme: 'dark',
-    groups: []
+    groups: [],
+    activeTab: 'individual'
   };
 }
 
@@ -67,6 +70,13 @@ export function createApp() {
 
   // 6. Create UI Components (self-contained, listen to events)
   // Note: Components are created BEFORE loading state so they can listen to STATE_HYDRATED
+
+  // Tab switcher
+  const tabSwitcher = new TabSwitcher(
+    eventBus,
+    stateManager,
+    'tabNav'
+  );
 
   // Cooldown display
   const cooldownDisplay = new CooldownDisplay(
@@ -130,6 +140,62 @@ export function createApp() {
     eventBus,
     stateManager,
     'themeToggle'
+  );
+
+  // === Groups Tab Components ===
+
+  // Group manager
+  const groupManager = new GroupManager(
+    eventBus,
+    stateManager,
+    'groupManager',
+    equations
+  );
+
+  // Groups tab chart
+  const chartComponentGroups = new ChartComponent(
+    eventBus,
+    'chartGroups',
+    {
+      timeAxis,
+      title: CONFIG.chart.title,
+      breakpoints: BREAKPOINTS,
+      mode: 'groups'
+    }
+  );
+
+  // Groups tab ranking tables
+  const rankingsTableGroups = new RankingTable(
+    eventBus,
+    stateManager,
+    'rankingsGroups',
+    timeAxis,
+    'breakpoints',
+    'groups'
+  );
+
+  const rankingsCastsTableGroups = new RankingTable(
+    eventBus,
+    stateManager,
+    'rankingsCastsGroups',
+    timeAxis,
+    'casts',
+    'groups'
+  );
+
+  // Groups tab breakpoint toggles
+  const breakpointTogglesGroups = new BreakpointToggles(
+    eventBus,
+    stateManager,
+    'breakpointTogglesGroups',
+    BREAKPOINTS
+  );
+
+  // Groups tab cast time toggles
+  const castTimeTogglesGroups = new CastTimeToggles(
+    eventBus,
+    stateManager,
+    'breakpointTogglesCastsGroups'
   );
 
   // 7. Setup reset button

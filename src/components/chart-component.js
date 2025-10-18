@@ -11,7 +11,10 @@ import { createChart } from '../ui/chart.js';
 export class ChartComponent {
   constructor(eventBus, containerId, options) {
     this.eventBus = eventBus;
+    this.containerId = containerId;
     this.chart = createChart(containerId, options);
+    this.mode = options.mode || 'individual'; // 'individual' or 'groups'
+    this.lastData = null; // Store last render data
 
     if (!this.chart) {
       console.error(`ChartComponent: Failed to create chart in #${containerId}`);
@@ -21,6 +24,29 @@ export class ChartComponent {
     // Listen to events
     this.eventBus.on(Events.CALCULATIONS_UPDATED, this.render.bind(this));
     this.eventBus.on(Events.THEME_CHANGED, this.updateTheme.bind(this));
+
+    // Listen to tab changes to handle resize for groups tab
+    if (this.mode === 'groups') {
+      this.eventBus.on(Events.TAB_CHANGED, this.onTabChanged.bind(this));
+    }
+  }
+
+  /**
+   * Handle tab change events
+   * @param {Object} detail - { tab }
+   */
+  onTabChanged({ tab }) {
+    // When switching to groups tab, resize the chart
+    if (tab === 'groups' && this.lastData) {
+      // Small delay to ensure tab is visible before resizing
+      setTimeout(() => {
+        const container = document.getElementById(this.containerId);
+        if (container && container.offsetParent !== null) {
+          // Container is visible, trigger Plotly resize
+          window.Plotly.Plots.resize(this.containerId);
+        }
+      }, 50);
+    }
   }
 
   /**
@@ -28,16 +54,40 @@ export class ChartComponent {
    * @param {Object} detail - { series, groupSeries, cooldown }
    */
   render({ series, groupSeries, cooldown }) {
-    if (!series) return;
+    let seriesToRender = [];
 
-    // Combine individual series with group series
-    const allSeries = [...series];
-    if (groupSeries && groupSeries.length > 0) {
-      allSeries.push(...groupSeries);
+    if (this.mode === 'groups') {
+      // Groups tab: only show group series
+      if (groupSeries && groupSeries.length > 0) {
+        seriesToRender = [...groupSeries];
+      }
+    } else {
+      // Individual tab: show individual series (and optionally group series)
+      if (series) {
+        seriesToRender = [...series];
+      }
+      if (groupSeries && groupSeries.length > 0) {
+        seriesToRender.push(...groupSeries);
+      }
     }
 
+    // Store last data for potential re-render
+    this.lastData = { series, groupSeries, cooldown };
+
     // Render chart
-    this.chart.render(allSeries, cooldown);
+    if (seriesToRender.length > 0) {
+      this.chart.render(seriesToRender, cooldown);
+
+      // For groups mode, trigger resize after render to fix initial width
+      if (this.mode === 'groups') {
+        setTimeout(() => {
+          const container = document.getElementById(this.containerId);
+          if (container && container.offsetParent !== null) {
+            window.Plotly.Plots.resize(this.containerId);
+          }
+        }, 100);
+      }
+    }
   }
 
   /**

@@ -34,6 +34,13 @@ export const CONFIG = {
     },
   },
 
+  // Group colors palette (predefined colors for groups)
+  groups: {
+    colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'],
+    maxGroups: 4,
+    maxEquationsPerGroup: 4,
+  },
+
   // Storage
   storage: {
     key: 'stellar-plot-prefs',
@@ -45,3 +52,6 @@ export const BASE_COOLDOWN = CONFIG.cooldown.base;
 export const MAX_TIME = CONFIG.simulation.maxTime;
 export const CAST_OFFSET = CONFIG.simulation.castOffset;
 export const BREAKPOINTS = CONFIG.breakpoints.battleLength;
+export const GROUP_COLORS = CONFIG.groups.colors;
+export const MAX_GROUPS = CONFIG.groups.maxGroups;
+export const MAX_EQUATIONS_PER_GROUP = CONFIG.groups.maxEquationsPerGroup;

@@ -17,27 +17,49 @@
       </button>
       <h1>Stellar Simulator</h1>
     </div>
-    <div class="controls card">
-      <div class="row" style="justify-content: space-between">
-        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1">
-          <div class="tooltip-wrapper">
-            <div id="cooldownDisplay" class="pill" style="width: fit-content">Stellar Cooldown: 30s</div>
-            <div class="tooltip-content"></div>
+
+    <!-- Tab Navigation -->
+    <div id="tabNav" class="card" style="margin-bottom: 16px;"></div>
+
+    <!-- Individual Tab -->
+    <div id="tab-individual" class="tab-content" data-active="true">
+      <div class="controls card">
+        <div class="row" style="justify-content: space-between">
+          <div style="display: flex; flex-direction: column; gap: 8px; flex: 1">
+            <div class="tooltip-wrapper">
+              <div id="cooldownDisplay" class="pill" style="width: fit-content">Stellar Cooldown: 30s</div>
+              <div class="tooltip-content"></div>
+            </div>
+            <div class="eqs" id="eqToggles"></div>
           </div>
-          <div class="eqs" id="eqToggles"></div>
+          <button id="reset" class="primary">Reset</button>
         </div>
-        <button id="reset" class="primary">Reset</button>
+      </div>
+
+      <div id="chart" class="card" style="height: 640px; margin-bottom: 16px;"></div>
+      <div class="card" style="overflow-x: auto; display: grid; grid-template-columns: auto 1fr; column-gap: 1rem;">
+        <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by battle length</h2>
+        <div id="breakpointToggles" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div id="rankings" style="grid-column: span 2; margin-bottom: 1rem;"></div>
+        <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by casts</h2>
+        <div id="breakpointTogglesCasts" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div id="rankingsCasts" style="grid-column: span 2; margin-bottom: 1rem;"></div>
       </div>
     </div>
 
-    <div id="chart" class="card" style="height: 640px; margin-bottom: 16px;"></div>
-    <div class="card" style="overflow-x: auto; display: grid; grid-template-columns: auto 1fr; column-gap: 1rem;">
-      <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by battle length</h2>
-      <div id="breakpointToggles" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-      <div id="rankings" style="grid-column: span 2; margin-bottom: 1rem;"></div>
-      <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by casts</h2>
-      <div id="breakpointTogglesCasts" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-      <div id="rankingsCasts" style="grid-column: span 2; margin-bottom: 1rem;"></div>
+    <!-- Groups Tab -->
+    <div id="tab-groups" class="tab-content" data-active="false">
+      <div id="groupManager" style="margin-bottom: 16px;"></div>
+
+      <div id="chartGroups" class="card" style="height: 640px; margin-bottom: 16px;"></div>
+      <div class="card" style="overflow-x: auto; display: grid; grid-template-columns: auto 1fr; column-gap: 1rem;">
+        <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by battle length</h2>
+        <div id="breakpointTogglesGroups" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div id="rankingsGroups" style="grid-column: span 2; margin-bottom: 1rem;"></div>
+        <h2 style="font-size:16px; font-weight:600; opacity:.9; width: fit-content;">Top by casts</h2>
+        <div id="breakpointTogglesCastsGroups" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div id="rankingsCastsGroups" style="grid-column: span 2; margin-bottom: 1rem;"></div>
+      </div>
     </div>
   </body>
 </html>

@@ -30,6 +30,7 @@ export class StorageManager {
     this.eventBus.on(Events.THEME_CHANGED, () => this.save());
     this.eventBus.on(Events.BREAKPOINTS_CHANGED, () => this.save());
     this.eventBus.on(Events.CAST_TIMES_CHANGED, () => this.save());
+    this.eventBus.on(Events.TAB_CHANGED, () => this.save());
     this.eventBus.on(Events.GROUP_ADDED, () => this.save());
     this.eventBus.on(Events.GROUP_REMOVED, () => this.save());
     this.eventBus.on(Events.GROUP_UPDATED, () => this.save());
@@ -87,6 +88,7 @@ export class StorageManager {
       selectedBreakpoints: Array.from(state.selectedBreakpoints),
       selectedCastTimes: Array.from(state.selectedCastTimes),
       theme: state.theme,
+      activeTab: state.activeTab,
       groups: state.groups.map(g => ({
         name: g.name,
         keys: Array.from(g.keys),
@@ -106,6 +108,7 @@ export class StorageManager {
       selectedBreakpoints: new Set(stored.selectedBreakpoints || []),
       selectedCastTimes: new Set(stored.selectedCastTimes || []),
       theme: stored.theme || 'dark',
+      activeTab: stored.activeTab || 'individual',
       groups: (stored.groups || []).map(g => ({
         name: g.name,
         keys: new Set(g.keys),

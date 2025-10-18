@@ -9,12 +9,13 @@ import { Events } from '../events/event-types.js';
 import { renderTable } from '../ui/table.js';
 
 export class RankingTable {
-  constructor(eventBus, stateManager, containerId, timeAxis, type = 'breakpoints') {
+  constructor(eventBus, stateManager, containerId, timeAxis, type = 'breakpoints', mode = 'individual') {
     this.eventBus = eventBus;
     this.stateManager = stateManager;
     this.containerId = containerId;
     this.timeAxis = timeAxis;
     this.type = type;
+    this.mode = mode; // 'individual' or 'groups'
 
     this.lastResults = null;
 
@@ -64,15 +65,28 @@ export class RankingTable {
    * Render the table
    */
   render() {
-    if (!this.lastResults || !this.lastResults.series) return;
+    if (!this.lastResults) return;
 
     const state = this.stateManager.getState();
 
-    // Combine individual series with group series
-    const allSeries = [...this.lastResults.series];
-    if (this.lastResults.groupSeries && this.lastResults.groupSeries.length > 0) {
-      allSeries.push(...this.lastResults.groupSeries);
+    // Filter series based on mode
+    let seriesToRender = [];
+    if (this.mode === 'groups') {
+      // Groups tab: only show group series
+      if (this.lastResults.groupSeries && this.lastResults.groupSeries.length > 0) {
+        seriesToRender = [...this.lastResults.groupSeries];
+      }
+    } else {
+      // Individual tab: show individual series (and optionally group series)
+      if (this.lastResults.series) {
+        seriesToRender = [...this.lastResults.series];
+      }
+      if (this.lastResults.groupSeries && this.lastResults.groupSeries.length > 0) {
+        seriesToRender.push(...this.lastResults.groupSeries);
+      }
     }
+
+    if (seriesToRender.length === 0) return;
 
     // Get time points based on type
     let timePoints;
@@ -83,6 +97,6 @@ export class RankingTable {
     }
 
     // Render table
-    renderTable(this.containerId, timePoints, allSeries, this.timeAxis);
+    renderTable(this.containerId, timePoints, seriesToRender, this.timeAxis);
   }
 }

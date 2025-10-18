@@ -10,6 +10,7 @@ export const Events = {
   THEME_CHANGED: 'theme:changed',
   BREAKPOINTS_CHANGED: 'breakpoints:changed',
   CAST_TIMES_CHANGED: 'cast-times:changed',
+  TAB_CHANGED: 'tab:changed',
 
   // Group management events
   GROUP_ADDED: 'group:added',
