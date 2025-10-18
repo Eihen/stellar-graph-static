@@ -4,103 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Stellar Simulator</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg-main: #0b1220;
-        --bg-card: #111827;
-        --bg-element: #0f172a;
-        --text-primary: #e6edf3;
-        --border-color: #243145;
-        --border-element: #2b3b52;
-        --accent-color: #3b82f6;
-        --accent-border: #2563eb;
-        --link-color: #93c5fd;
-      }
-      :root[data-theme="light"] {
-        color-scheme: light;
-        --bg-main: #ffffff;
-        --bg-card: #f8fafc;
-        --bg-element: #f1f5f9;
-        --text-primary: #1e293b;
-        --border-color: #e2e8f0;
-        --border-element: #cbd5e1;
-        --accent-color: #3b82f6;
-        --accent-border: #2563eb;
-        --link-color: #2563eb;
-      }
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 24px; background: var(--bg-main); color: var(--text-primary); }
-      h1 { margin: 0; font-size: 20px; }
-      .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
-      .theme-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 34px;
-        height: 34px;
-        padding: 0;
-        background: var(--bg-element);
-        border: 1px solid var(--border-element);
-        border-radius: 8px;
-        color: var(--text-primary);
-        cursor: pointer;
-      }
-      .theme-toggle:hover {
-        background: var(--bg-card);
-      }
-      .theme-toggle[data-active="true"] {
-        background: var(--accent-color);
-        border-color: var(--accent-border);
-        color: white;
-      }
-      .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; }
-      .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-      label { display:flex; align-items:center; gap:6px; }
-      .eqs { display:flex; flex-wrap:wrap; gap:10px; }
-      .pill { display:inline-flex; gap:6px; align-items:center; border: 1px solid var(--border-element); border-radius: 999px; padding:6px 10px; background: var(--bg-element); }
-      input[type="checkbox"] { accent-color: var(--accent-color); }
-      select, button { background: var(--bg-element); color: var(--text-primary); border: 1px solid var(--border-element); border-radius:8px; padding:6px 10px; }
-      button.primary { background: var(--accent-border); border-color: var(--accent-border); }
-      a { color: var(--link-color); }
-      
-      /* Tooltip styles */
-      .tooltip-wrapper {
-        position: relative;
-        display: inline-block;
-        width: fit-content;
-      }
-      .tooltip-content {
-        display: none;
-        position: absolute;
-        z-index: 1;
-        top: 100%;
-        left: 0;
-        margin-top: 8px;
-        padding: 8px 12px;
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        white-space: pre-line;
-        font-size: 14px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        min-width: 200px;
-      }
-      .tooltip-content.visible {
-        display: block;
-      }
-      /* Arrow */
-      .tooltip-content::before {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 20px;
-        border-width: 6px;
-        border-style: solid;
-        border-color: transparent transparent var(--border-color) transparent;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </head>
   <body>
     <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
@@ -109,7 +15,7 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
-      <h1>Stellar Plot (Interactive)</h1>
+      <h1>Stellar Simulator</h1>
     </div>
     <div class="controls card">
       <div class="row" style="justify-content: space-between">

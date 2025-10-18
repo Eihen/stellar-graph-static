@@ -1,0 +1,22 @@
+{
+  "name": "stellar-graph-static",
+  "version": "1.0.0",
+  "description": "Stellar Simulator — README",
+  "main": "main.js",
+  "scripts": {
+    "start": "http-server -p 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eihen/stellar-graph-static.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Eihen/stellar-graph-static/issues"
+  },
+  "homepage": "https://github.com/Eihen/stellar-graph-static#readme",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
