@@ -77,12 +77,9 @@ export class RankingTable {
         seriesToRender = [...this.lastResults.groupSeries];
       }
     } else {
-      // Individual tab: show individual series (and optionally group series)
+      // Individual tab: only show individual series
       if (this.lastResults.series) {
         seriesToRender = [...this.lastResults.series];
-      }
-      if (this.lastResults.groupSeries && this.lastResults.groupSeries.length > 0) {
-        seriesToRender.push(...this.lastResults.groupSeries);
       }
     }
 
@@ -92,8 +89,20 @@ export class RankingTable {
     let timePoints;
     if (this.type === 'breakpoints') {
       timePoints = Array.from(state.selectedBreakpoints).sort((a, b) => a - b);
-    } else {
-      timePoints = Array.from(state.selectedCastTimes).sort((a, b) => a - b);
+    } else if (this.type === 'casts') {
+      // For groups mode, collect union of all cast times from all groups
+      if (this.mode === 'groups') {
+        const allCastTimes = new Set();
+        seriesToRender.forEach(series => {
+          if (series.castTimes && series.castTimes.length > 0) {
+            series.castTimes.forEach(ct => allCastTimes.add(ct));
+          }
+        });
+        timePoints = Array.from(allCastTimes).sort((a, b) => a - b);
+      } else {
+        // Individual mode uses selected cast times from state
+        timePoints = Array.from(state.selectedCastTimes).sort((a, b) => a - b);
+      }
     }
 
     // Render table

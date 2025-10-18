@@ -24,7 +24,9 @@ export function renderTable(containerId, timePoints, series, timeAxis) {
     const sorted = [...series]
       .map(s => ({
         name: s.key,
-        value: Number((s.mean[timeIndex] * 10).toFixed(4))
+        value: Number((s.mean[timeIndex] * 10).toFixed(4)),
+        color: s.color,
+        isCast: s.castTimes && s.castTimes.includes(timePoint)
       }))
       .sort((a, b) => b.value - a.value);
 
@@ -67,13 +69,20 @@ export function renderTable(containerId, timePoints, series, timeAxis) {
         }
       }
 
-      html += `<div style="opacity:.9; display: flex; align-items: center; white-space: nowrap;">${arrow}${row.name}</div>`;
-      html += `<div style="text-align:right; font-variant-numeric: tabular-nums;">${row.value}</div>`;
+      // Apply bold styling if this is an actual cast for this series
+      const fontWeight = row.isCast ? 'font-weight: 700;' : '';
+
+      html += `<div style="opacity:.9; display: flex; align-items: center; white-space: nowrap; ${fontWeight}">${arrow}${row.name}</div>`;
+      html += `<div style="text-align:right; font-variant-numeric: tabular-nums; ${fontWeight}">${row.value}</div>`;
     });
 
     html += '</div></div>';
   });
 
   html += '</div>';
+
+  // Add footer explaining bold text
+  html += '<div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #2b3b52; opacity: 0.7; font-size: 0.9em;">Bold entries indicate actual cast times for that group.</div>';
+
   container.innerHTML = html;
 }

@@ -7,7 +7,7 @@
  * Create a multi-select dropdown
  * @param {Object} options - Configuration options
  * @param {string} options.id - Unique ID for the select element
- * @param {Array<{value: string, label: string}>} options.items - Items to select from
+ * @param {Array<{value: string, label: string, color?: string}>} options.items - Items to select from
  * @param {Set<string>} options.selected - Currently selected values
  * @param {number} options.maxItems - Maximum number of items that can be selected
  * @param {Function} options.onChange - Callback when selection changes (selected: Set<string>) => void
@@ -34,12 +34,16 @@ export function createMultiSelect({ id, items, selected, maxItems, onChange, dis
       display.innerHTML = '<span class="multi-select-placeholder">Select equations...</span>';
     } else {
       const selectedItems = items.filter(item => selected.has(item.value));
-      display.innerHTML = selectedItems.map(item =>
-        `<span class="multi-select-tag">
+      display.innerHTML = selectedItems.map(item => {
+        const colorDot = item.color
+          ? `<span class="color-dot" style="background-color: ${item.color};"></span>`
+          : '';
+        return `<span class="multi-select-tag">
+          ${colorDot}
           ${item.label}
           <button class="multi-select-remove" data-value="${item.value}" type="button">&times;</button>
-        </span>`
-      ).join('');
+        </span>`;
+      }).join('');
     }
 
     // Add dropdown arrow
@@ -64,12 +68,17 @@ export function createMultiSelect({ id, items, selected, maxItems, onChange, dis
       if (isSelected) option.classList.add('selected');
       if (isDisabled || isMaxReached) option.classList.add('disabled');
 
+      const colorDot = item.color
+        ? `<span class="color-dot" style="background-color: ${item.color};"></span>`
+        : '';
+
       option.innerHTML = `
         <input
           type="checkbox"
           ${isSelected ? 'checked' : ''}
           ${isDisabled || isMaxReached ? 'disabled' : ''}
         />
+        ${colorDot}
         <span>${item.label}</span>
       `;
 

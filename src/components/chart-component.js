@@ -62,12 +62,9 @@ export class ChartComponent {
         seriesToRender = [...groupSeries];
       }
     } else {
-      // Individual tab: show individual series (and optionally group series)
+      // Individual tab: only show individual series
       if (series) {
         seriesToRender = [...series];
-      }
-      if (groupSeries && groupSeries.length > 0) {
-        seriesToRender.push(...groupSeries);
       }
     }
 
