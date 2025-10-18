@@ -76,8 +76,7 @@ EventBus (broadcasts event)
    └─→ RankingTable (x2): Update tables
    ↓
 7. COOLDOWN_CHANGED event broadcast
-   ├─→ CooldownDisplay: Updates display text "30s"
-   └─→ CastTimeToggles: Regenerates toggles with new cast times
+   └─→ CooldownDisplay: Updates display text "30s"
 ```
 
 ## Event Types
@@ -89,8 +88,7 @@ EventBus (broadcasts event)
 | `EQUATION_TOGGLED` | StateManager | `{ key, enabled, enabledKeys }` | CalculationManager, StorageManager |
 | `EQUATIONS_RESET` | StateManager | `{ enabledKeys }` | CalculationManager, StorageManager, EquationToggles |
 | `THEME_CHANGED` | StateManager | `{ theme }` | StorageManager, ThemeToggle, ChartComponent |
-| `BREAKPOINTS_CHANGED` | StateManager | `{ breakpoints }` | StorageManager, RankingTable |
-| `CAST_TIMES_CHANGED` | StateManager | `{ castTimes }` | StorageManager, RankingTable |
+| `TAB_CHANGED` | StateManager | `{ tab }` | StorageManager, TabSwitcher |
 | `GROUP_ADDED` | StateManager | `{ group, groups, enabledKeys }` | CalculationManager, StorageManager |
 | `GROUP_REMOVED` | StateManager | `{ groupName, groups, enabledKeys }` | CalculationManager, StorageManager |
 | `GROUP_UPDATED` | StateManager | `{ groupName, group, groups, enabledKeys }` | CalculationManager, StorageManager |
@@ -99,8 +97,8 @@ EventBus (broadcasts event)
 
 | Event | Emitted By | Payload | Listeners |
 |-------|-----------|---------|-----------|
-| `CALCULATIONS_UPDATED` | CalculationManager | `{ series, groupSeries, cooldown, ... }` | ChartComponent, RankingTable (x2) |
-| `COOLDOWN_CHANGED` | CalculationManager | `{ cooldown, modifiers, castTimes }` | CooldownDisplay, CastTimeToggles |
+| `CALCULATIONS_UPDATED` | CalculationManager | `{ series, groupSeries, cooldown, ... }` | ChartComponent, RankingTable (x4) |
+| `COOLDOWN_CHANGED` | CalculationManager | `{ cooldown, modifiers, castTimes }` | CooldownDisplay |
 
 ## Component Responsibilities
 
@@ -205,9 +203,9 @@ Renders the main Plotly chart showing DPS over time.
 
 #### RankingTable ([src/components/ranking-table.js](src/components/ranking-table.js))
 
-Displays ranking tables for either breakpoints or cast times.
+Displays ranking tables for either breakpoints or cast times. Automatically shows all relevant time points based on mode.
 
-**Listens To:** `CALCULATIONS_UPDATED`, `BREAKPOINTS_CHANGED` or `CAST_TIMES_CHANGED`
+**Listens To:** `CALCULATIONS_UPDATED`
 **Updates:** Ranking table
 
 **Types:**
@@ -221,21 +219,6 @@ Renders equation toggle checkboxes.
 **Listens To:** `EQUATIONS_RESET`
 **Calls:** `stateManager.toggleEquation(key)`
 **Updates:** Checkbox states
-
-#### BreakpointToggles ([src/components/breakpoint-toggles.js](src/components/breakpoint-toggles.js))
-
-Renders breakpoint selection toggles.
-
-**Listens To:** None (static)
-**Calls:** `stateManager.updateBreakpoints(selected)`
-
-#### CastTimeToggles ([src/components/cast-time-toggles.js](src/components/cast-time-toggles.js))
-
-Renders cast time selection toggles.
-
-**Listens To:** `COOLDOWN_CHANGED`
-**Calls:** `stateManager.updateCastTimes(selected)`
-**Updates:** Regenerates toggles when cooldown changes
 
 #### ThemeToggle ([src/components/theme-toggle.js](src/components/theme-toggle.js))
 
@@ -294,10 +277,10 @@ src/
 
 Only components that care about an event update, not all components on every state change.
 
-**Example:** When breakpoints change:
-- ✅ RankingTable (breakpoints) updates
-- ❌ ChartComponent does NOT update (doesn't listen to `BREAKPOINTS_CHANGED`)
-- ❌ CooldownDisplay does NOT update
+**Example:** When calculations update:
+- ✅ RankingTable (all 4 instances) update with new data
+- ✅ ChartComponent (both modes) updates
+- ❌ CooldownDisplay does NOT update (only listens to `COOLDOWN_CHANGED`)
 
 ### Lazy Calculations
 

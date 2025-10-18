@@ -329,7 +329,8 @@ console.log(state);
 // {
 //   enabledKeys: Set(['Toybox', 'World's Night']),
 //   theme: 'dark',
-//   selectedBreakpoints: Set([60, 120, 180]),
+//   activeTab: 'individual',
+//   groups: [],
 //   ...
 // }
 ```

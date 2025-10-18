@@ -35,8 +35,6 @@ export class StorageManager {
     this.eventBus.on(Events.EQUATION_TOGGLED, () => this.save());
     this.eventBus.on(Events.EQUATIONS_RESET, () => this.save());
     this.eventBus.on(Events.THEME_CHANGED, () => this.save());
-    this.eventBus.on(Events.BREAKPOINTS_CHANGED, () => this.save());
-    this.eventBus.on(Events.CAST_TIMES_CHANGED, () => this.save());
     this.eventBus.on(Events.TAB_CHANGED, () => this.save());
     this.eventBus.on(Events.GROUP_ADDED, () => this.save());
     this.eventBus.on(Events.GROUP_REMOVED, () => this.save());
@@ -93,8 +91,6 @@ export class StorageManager {
   serializeState(state) {
     return {
       enabledKeys: Array.from(state.enabledKeys),
-      selectedBreakpoints: Array.from(state.selectedBreakpoints),
-      selectedCastTimes: Array.from(state.selectedCastTimes),
       theme: state.theme,
       activeTab: state.activeTab,
       groups: state.groups.map(g => ({
@@ -113,8 +109,6 @@ export class StorageManager {
   deserializeState(stored) {
     return {
       enabledKeys: new Set(stored.enabledKeys || []),
-      selectedBreakpoints: new Set(stored.selectedBreakpoints || []),
-      selectedCastTimes: new Set(stored.selectedCastTimes || []),
       theme: stored.theme || 'dark',
       activeTab: stored.activeTab || 'individual',
       groups: (stored.groups || []).map(g => ({
@@ -128,7 +122,7 @@ export class StorageManager {
   /**
    * Serialize groups state for URL (only groups-relevant data)
    * Compact format to minimize URL length:
-   * - Short property names (g, n, k, c, b, t)
+   * - Short property names (g, n, k, c)
    * - Use equation IDs instead of keys
    * - Omit empty/default values
    * @returns {Object} Serializable object for URL
@@ -162,29 +156,20 @@ export class StorageManager {
       }).filter(g => Object.keys(g).length > 0) // Remove completely empty groups
     };
 
-    // Only include breakpoints if not empty
-    const breakpoints = Array.from(state.selectedBreakpoints);
-    if (breakpoints.length > 0) {
-      compact.b = breakpoints;
-    }
-
-    // Only include cast times if not empty
-    const castTimes = Array.from(state.selectedCastTimes);
-    if (castTimes.length > 0) {
-      compact.t = castTimes;
-    }
-
     return compact;
   }
 
   /**
    * Generate shareable URL with current groups state
+   * Uses LZ-String compression for optimal URL length
    * @returns {string} Shareable URL
    */
   generateShareUrl() {
     try {
       const groupsState = this.serializeGroupsForUrl();
-      const encoded = btoa(JSON.stringify(groupsState));
+      const jsonString = JSON.stringify(groupsState);
+      const encoded = window.LZString.compressToEncodedURIComponent(jsonString);
+
       const url = new URL(window.location.href);
       url.searchParams.set('state', encoded);
       return url.toString();
@@ -196,7 +181,7 @@ export class StorageManager {
 
   /**
    * Load state from URL query string if present
-   * Supports compact (with IDs), compact (with keys), and legacy formats
+   * Uses LZ-String decompression
    * @returns {Object|null} Decoded state or null
    */
   loadFromUrl() {
@@ -205,47 +190,33 @@ export class StorageManager {
       const encoded = urlParams.get('state');
       if (!encoded) return null;
 
-      const decoded = JSON.parse(atob(encoded));
+      // Decompress using LZ-String
+      const jsonString = window.LZString.decompressFromEncodedURIComponent(encoded);
+      if (!jsonString) {
+        throw new Error('Failed to decompress state from URL');
+      }
+
+      const decoded = JSON.parse(jsonString);
       this.isFromUrl = true;
 
       // Save to temp storage key
       localStorage.setItem(STORAGE_KEY_FROM_URL, JSON.stringify(decoded));
 
-      // Detect format: compact uses 'g', legacy uses 'groups'
-      const isCompact = 'g' in decoded;
+      // Decode compact format: { g: [{n, k, c}] }
+      const groups = (decoded.g || []).map((g, index) => {
+        // Convert IDs to keys
+        const keys = (g.k || []).map(id => this.idToKey.get(id)).filter(key => key !== undefined);
 
-      let groups;
-      if (isCompact) {
-        // Compact format: { g: [{n, k, c}], b: [], t: [] }
-        groups = (decoded.g || []).map((g, index) => {
-          let keys = g.k || [];
-
-          // Check if keys are IDs (numbers) or key names (strings)
-          if (keys.length > 0 && typeof keys[0] === 'number') {
-            // Convert IDs to keys
-            keys = keys.map(id => this.idToKey.get(id)).filter(key => key !== undefined);
-          }
-
-          return {
-            name: g.n || `Group ${index + 1}`,
-            keys: new Set(keys),
-            color: g.c
-          };
-        });
-      } else {
-        // Legacy format: { groups: [{name, keys, color}], selectedBreakpoints, selectedCastTimes }
-        groups = (decoded.groups || []).map(g => ({
-          name: g.name,
-          keys: new Set(g.keys),
-          color: g.color
-        }));
-      }
+        return {
+          name: g.n || `Group ${index + 1}`,
+          keys: new Set(keys),
+          color: g.c
+        };
+      });
 
       // Return partial state (only groups-related)
       return {
         groups,
-        selectedBreakpoints: new Set(decoded.b || decoded.selectedBreakpoints || []),
-        selectedCastTimes: new Set(decoded.t || decoded.selectedCastTimes || []),
         activeTab: 'groups' // Always open groups tab when loading from URL
       };
     } catch (error) {
@@ -271,8 +242,6 @@ export class StorageManager {
       const merged = {
         ...defaultState,
         groups: urlStateObj.groups,
-        selectedBreakpoints: urlStateObj.selectedBreakpoints,
-        selectedCastTimes: urlStateObj.selectedCastTimes,
         activeTab: 'groups'
       };
 

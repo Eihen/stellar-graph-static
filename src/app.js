@@ -19,8 +19,6 @@ import { CooldownDisplay } from './components/cooldown-display.js';
 import { ChartComponent } from './components/chart-component.js';
 import { RankingTable } from './components/ranking-table.js';
 import { EquationToggles } from './components/equation-toggles.js';
-import { BreakpointToggles } from './components/breakpoint-toggles.js';
-import { CastTimeToggles } from './components/cast-time-toggles.js';
 import { ThemeToggle } from './components/theme-toggle.js';
 import { GroupManager } from './components/group-manager.js';
 import { ShareButton } from './components/share-button.js';
@@ -30,11 +28,9 @@ import { ResetButton } from './components/reset-button.js';
 /**
  * Create initial state
  */
-function createInitialState(equations, breakpoints) {
+function createInitialState(equations) {
   return {
     enabledKeys: new Set(equations.map(eq => eq.key)),
-    selectedBreakpoints: new Set(breakpoints),
-    selectedCastTimes: new Set(),
     theme: 'dark',
     groups: [],
     activeTab: 'individual'
@@ -57,7 +53,7 @@ export function createApp() {
   const { timeAxis, equations } = createEquations(CONFIG.simulation.maxTime);
 
   // 3. Create StateManager
-  const initialState = createInitialState(equations, BREAKPOINTS);
+  const initialState = createInitialState(equations);
   const stateManager = new StateManager(eventBus, initialState);
 
   // 4. Create StorageManager (handles persistence)
@@ -104,7 +100,9 @@ export function createApp() {
     stateManager,
     'rankings',
     timeAxis,
-    'breakpoints'
+    'breakpoints',
+    'individual',
+    BREAKPOINTS
   );
 
   const rankingsCastsTable = new RankingTable(
@@ -121,21 +119,6 @@ export function createApp() {
     stateManager,
     'eqToggles',
     equations
-  );
-
-  // Breakpoint toggles
-  const breakpointToggles = new BreakpointToggles(
-    eventBus,
-    stateManager,
-    'breakpointToggles',
-    BREAKPOINTS
-  );
-
-  // Cast time toggles
-  const castTimeToggles = new CastTimeToggles(
-    eventBus,
-    stateManager,
-    'breakpointTogglesCasts'
   );
 
   // Theme toggle
@@ -174,7 +157,8 @@ export function createApp() {
     'rankingsGroups',
     timeAxis,
     'breakpoints',
-    'groups'
+    'groups',
+    BREAKPOINTS
   );
 
   const rankingsCastsTableGroups = new RankingTable(
@@ -184,21 +168,6 @@ export function createApp() {
     timeAxis,
     'casts',
     'groups'
-  );
-
-  // Groups tab breakpoint toggles
-  const breakpointTogglesGroups = new BreakpointToggles(
-    eventBus,
-    stateManager,
-    'breakpointTogglesGroups',
-    BREAKPOINTS
-  );
-
-  // Groups tab cast time toggles
-  const castTimeTogglesGroups = new CastTimeToggles(
-    eventBus,
-    stateManager,
-    'breakpointTogglesCastsGroups'
   );
 
   // 7. Setup button components

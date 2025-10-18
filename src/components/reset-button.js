@@ -32,9 +32,6 @@ export class ResetButton {
     // Reset state
     this.stateManager.resetEquations(this.config.equationKeys);
 
-    // Reset breakpoints (will emit event)
-    this.stateManager.updateBreakpoints(this.config.breakpoints);
-
     // Reset theme
     if (this.stateManager.getState().theme !== 'dark') {
       this.stateManager.changeTheme('dark');

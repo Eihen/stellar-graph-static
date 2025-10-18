@@ -122,8 +122,7 @@ Event type constants.
 Events.EQUATION_TOGGLED      // { key, enabled, enabledKeys }
 Events.EQUATIONS_RESET       // { enabledKeys }
 Events.THEME_CHANGED         // { theme }
-Events.BREAKPOINTS_CHANGED   // { breakpoints }
-Events.CAST_TIMES_CHANGED    // { castTimes }
+Events.TAB_CHANGED           // { tab }
 Events.GROUP_ADDED           // { group, groups, enabledKeys }
 Events.GROUP_REMOVED         // { groupName, groups, enabledKeys }
 Events.GROUP_UPDATED         // { groupName, group, groups, enabledKeys }
@@ -162,9 +161,8 @@ new StateManager(eventBus, initialState)
 {
   enabledKeys: Set<string>,           // Enabled equation keys
   theme: 'light' | 'dark',            // Current theme
-  selectedBreakpoints: Set<number>,   // Selected breakpoint times
-  selectedCastTimes: Set<number>,     // Selected cast times
-  groups: Map<string, Group>          // Equation groups
+  activeTab: 'individual' | 'groups', // Active tab
+  groups: Array<Group>                // Equation groups (up to 4)
 }
 ```
 
@@ -198,24 +196,6 @@ Change the theme.
 - `theme` ('light' | 'dark') - New theme
 
 **Emits:** `THEME_CHANGED`
-
-##### `updateBreakpoints(selected)`
-
-Update selected breakpoints.
-
-**Parameters:**
-- `selected` (number[]) - Array of selected breakpoint times
-
-**Emits:** `BREAKPOINTS_CHANGED`
-
-##### `updateCastTimes(selected)`
-
-Update selected cast times.
-
-**Parameters:**
-- `selected` (number[]) - Array of selected cast times
-
-**Emits:** `CAST_TIMES_CHANGED`
 
 ##### `addGroup(group)`
 
@@ -408,9 +388,6 @@ new RankingTable(eventBus, stateManager, containerId, timeAxis, type)
 #### Events Listened To
 
 - `CALCULATIONS_UPDATED`
-- `BREAKPOINTS_CHANGED` (if type === 'breakpoints')
-- `CAST_TIMES_CHANGED` (if type === 'casts')
-- `COOLDOWN_CHANGED` (if type === 'casts')
 
 ---
 
@@ -435,49 +412,6 @@ new EquationToggles(eventBus, stateManager, containerId, equations)
 #### Events Listened To
 
 - `EQUATIONS_RESET`
-
----
-
-### BreakpointToggles
-
-**Location:** [src/components/breakpoint-toggles.js](src/components/breakpoint-toggles.js)
-
-Renders breakpoint selection toggles.
-
-#### Constructor
-
-```javascript
-new BreakpointToggles(eventBus, stateManager, containerId, breakpoints)
-```
-
-**Parameters:**
-- `eventBus` (EventBus) - EventBus instance
-- `stateManager` (StateManager) - StateManager instance
-- `containerId` (string) - DOM element ID
-- `breakpoints` (number[]) - Breakpoint times
-
----
-
-### CastTimeToggles
-
-**Location:** [src/components/cast-time-toggles.js](src/components/cast-time-toggles.js)
-
-Renders cast time selection toggles.
-
-#### Constructor
-
-```javascript
-new CastTimeToggles(eventBus, stateManager, containerId)
-```
-
-**Parameters:**
-- `eventBus` (EventBus) - EventBus instance
-- `stateManager` (StateManager) - StateManager instance
-- `containerId` (string) - DOM element ID
-
-#### Events Listened To
-
-- `COOLDOWN_CHANGED`
 
 ---
 
@@ -760,9 +694,8 @@ Application constants.
 {
   enabledKeys: Set<string>,
   theme: 'light' | 'dark',
-  selectedBreakpoints: Set<number>,
-  selectedCastTimes: Set<number>,
-  groups: Map<string, Group>
+  activeTab: 'individual' | 'groups',
+  groups: Array<Group>
 }
 ```
 

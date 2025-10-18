@@ -1,7 +1,7 @@
 /**
  * RankingTable - Displays ranking table for breakpoints or cast times
  *
- * Listens to: CALCULATIONS_UPDATED, BREAKPOINTS_CHANGED or COOLDOWN_CHANGED + CAST_TIMES_CHANGED
+ * Listens to: CALCULATIONS_UPDATED
  * Updates: Ranking table rendering
  */
 
@@ -9,13 +9,14 @@ import { Events } from '../events/event-types.js';
 import { renderTable } from '../ui/table.js';
 
 export class RankingTable {
-  constructor(eventBus, stateManager, containerId, timeAxis, type = 'breakpoints', mode = 'individual') {
+  constructor(eventBus, stateManager, containerId, timeAxis, type = 'breakpoints', mode = 'individual', breakpoints = []) {
     this.eventBus = eventBus;
     this.stateManager = stateManager;
     this.containerId = containerId;
     this.timeAxis = timeAxis;
     this.type = type;
     this.mode = mode; // 'individual' or 'groups'
+    this.breakpoints = breakpoints; // Predefined breakpoints for 'breakpoints' type
 
     this.lastResults = null;
 
@@ -29,16 +30,6 @@ export class RankingTable {
   setupListeners() {
     // Always listen to calculation updates
     this.eventBus.on(Events.CALCULATIONS_UPDATED, this.onCalculationsUpdated.bind(this));
-
-    if (this.type === 'breakpoints') {
-      // Listen to breakpoint selection changes
-      this.eventBus.on(Events.BREAKPOINTS_CHANGED, this.render.bind(this));
-    } else if (this.type === 'casts') {
-      // Listen to cast time selection changes
-      this.eventBus.on(Events.CAST_TIMES_CHANGED, this.render.bind(this));
-      // Also listen to cooldown changes (affects available cast times)
-      this.eventBus.on(Events.COOLDOWN_CHANGED, this.onCooldownChanged.bind(this));
-    }
   }
 
   /**
@@ -51,23 +42,10 @@ export class RankingTable {
   }
 
   /**
-   * Handle cooldown changes (for cast time tables)
-   * @param {Object} detail - { castTimes }
-   */
-  onCooldownChanged({ castTimes }) {
-    if (this.type !== 'casts') return;
-
-    // Update state with new cast times (all selected by default)
-    this.stateManager.updateCastTimes(castTimes);
-  }
-
-  /**
    * Render the table
    */
   render() {
     if (!this.lastResults) return;
-
-    const state = this.stateManager.getState();
 
     // Filter series based on mode
     let seriesToRender = [];
@@ -88,10 +66,12 @@ export class RankingTable {
     // Get time points based on type
     let timePoints;
     if (this.type === 'breakpoints') {
-      timePoints = Array.from(state.selectedBreakpoints).sort((a, b) => a - b);
+      // Show all predefined breakpoints
+      timePoints = [...this.breakpoints];
     } else if (this.type === 'casts') {
-      // For groups mode, collect union of all cast times from all groups
+      // Show all cast times from calculations
       if (this.mode === 'groups') {
+        // For groups mode, collect union of all cast times from all groups
         const allCastTimes = new Set();
         seriesToRender.forEach(series => {
           if (series.castTimes && series.castTimes.length > 0) {
@@ -100,10 +80,15 @@ export class RankingTable {
         });
         timePoints = Array.from(allCastTimes).sort((a, b) => a - b);
       } else {
-        // Individual mode uses selected cast times from state
-        timePoints = Array.from(state.selectedCastTimes).sort((a, b) => a - b);
+        // Individual mode: get cast times from calculation results (global cooldown)
+        if (this.lastResults.castTimes && this.lastResults.castTimes.length > 0) {
+          timePoints = [...this.lastResults.castTimes];
+        }
       }
     }
+
+    // Don't render if timePoints is undefined or empty
+    if (!timePoints || timePoints.length === 0) return;
 
     // Render table (show footer only for cast time tables in groups mode)
     const showCastFooter = this.type === 'casts' && this.mode === 'groups';

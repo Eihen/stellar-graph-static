@@ -85,29 +85,6 @@ export class StateManager {
     });
   }
 
-  /**
-   * Update selected breakpoints
-   * @param {Array<number>} breakpoints - Selected breakpoint values
-   */
-  updateBreakpoints(breakpoints) {
-    this.state.selectedBreakpoints = new Set(breakpoints);
-
-    this.eventBus.emit(Events.BREAKPOINTS_CHANGED, {
-      breakpoints: Array.from(this.state.selectedBreakpoints)
-    });
-  }
-
-  /**
-   * Update selected cast times
-   * @param {Array<number>} castTimes - Selected cast time values
-   */
-  updateCastTimes(castTimes) {
-    this.state.selectedCastTimes = new Set(castTimes);
-
-    this.eventBus.emit(Events.CAST_TIMES_CHANGED, {
-      castTimes: Array.from(this.state.selectedCastTimes)
-    });
-  }
 
   /**
    * Add an equation group
@@ -173,8 +150,6 @@ export class StateManager {
     this.eventBus.emit(Events.STATE_HYDRATED, {
       enabledKeys: new Set(this.state.enabledKeys),
       theme: this.state.theme,
-      selectedBreakpoints: Array.from(this.state.selectedBreakpoints),
-      selectedCastTimes: Array.from(this.state.selectedCastTimes),
       groups: [...this.state.groups],
       activeTab: this.state.activeTab
     });

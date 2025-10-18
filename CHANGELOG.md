@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0]
+
+### Changed
+- **Removed time selection checkboxes** for simplified UX
+  - Ranking tables now automatically show all relevant time points
+  - "Top by battle length" shows all predefined breakpoints (30s, 60s, 90s, etc.)
+  - "Top by casts" shows all cast times based on cooldown calculations
+  - Eliminates complexity without sacrificing functionality
+
+### Removed
+- **Deleted unused components and code** after checkbox removal
+  - Removed `BreakpointToggles` component
+  - Removed `CastTimeToggles` component
+  - Removed `BREAKPOINTS_CHANGED` and `CAST_TIMES_CHANGED` events from event types
+  - Removed `selectedBreakpoints` and `selectedCastTimes` from state management
+  - Removed `updateBreakpoints()` and `updateCastTimes()` methods from StateManager
+  - Cleaned up storage serialization/deserialization (no longer saves/loads checkbox state)
+  - Removed references from all documentation (ARCHITECTURE.md, API_REFERENCE.md, DEVELOPER_GUIDE.md)
+
+### Fixed
+- Application crash after dead code cleanup: Added safety check to prevent `timePoints` being undefined when rendering cast time tables with no data
+- "Top by casts" table not displaying in individual mode: Fixed to use global `castTimes` from calculation results instead of trying to get from individual series objects
+
 ## [2.1.0]
 
 ### Added
@@ -29,9 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optimized URL state compression** for significantly shorter share URLs
   - Shortened property names: `groups`→`g`, `name`→`n`, `keys`→`k`, `color`→`c`, etc.
   - **Use numeric equation IDs** (0-9) instead of full equation names in URLs (saves 60-70%)
+  - **LZ-String compression** via CDN for additional 40-60% compression
   - Omit default values (default group names, empty arrays)
-  - Backward compatible with all legacy URL formats
-  - Total savings: 70-85% reduction in URL length compared to original format
+  - **Total savings: 85-95% reduction in URL length** compared to uncompressed format
+  - Simplified implementation to only use LZ-String (no backward compatibility needed pre-release)
 
 ### Fixed
 - Individual tab ranking tables incorrectly showing grouped equations alongside individual equations in both "Top by mean" and "Top by casts" tables

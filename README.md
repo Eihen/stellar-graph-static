@@ -6,6 +6,8 @@ A damage-over-time (DPS) simulator for analyzing buff/modifier combinations over
 
 - 🎯 **Interactive Visualization** - Real-time Plotly charts
 - 📊 **Dynamic Rankings** - Compare performance at different battle lengths
+- 👥 **Equation Groups** - Create up to 4 groups to compare different buff combinations
+- 🔗 **Share URLs** - Generate compressed shareable URLs for group configurations (85-95% size reduction)
 - ⚡ **Live Updates** - Event-driven architecture for responsive UI
 - 🎨 **Dark/Light Mode** - Theme support
 - 💾 **Auto-Save** - Preferences persist to localStorage
@@ -29,9 +31,16 @@ npx serve
 
 The simulator models how different buffs/modifiers (called "equations") affect DPS over time:
 
+### Individual Mode
 1. **Select equations** - Toggle different buffs on/off
 2. **Automatic calculation** - Cooldowns and cast times update automatically
 3. **View results** - Chart shows DPS progression, tables show rankings
+
+### Groups Mode
+1. **Create groups** - Up to 4 groups with custom equation combinations
+2. **Per-group cooldowns** - Each group calculates its own cooldown based on selected equations
+3. **Compare configurations** - See which buff combination performs best at different battle lengths
+4. **Share your setup** - Generate compressed shareable URLs (LZ-String compression reduces URL size by 85-95%)
 
 ### Example Equations
 
@@ -203,10 +212,12 @@ See [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) for development guidelines.
 
 ## Roadmap
 
-- [ ] Equation groups (compare multiple buff combinations)
+- [x] Equation groups (compare multiple buff combinations)
+- [x] Share configurations via URL
 - [ ] Export data to CSV
-- [ ] Share configurations via URL
 - [ ] More equation types (conditional, stacking, etc.)
+- [ ] Custom breakpoints (user-defined battle lengths)
+- [ ] Group naming and color customization
 - [ ] TypeScript migration
 - [ ] Unit tests
 
